@@ -10,30 +10,41 @@ scroll-behavior:smooth;
 
 body{
 font-family:'Montserrat',sans-serif;
-background:#0f0f0f;
+background:
+radial-gradient(circle at top right, rgba(107,17,32,.25), transparent 35%),
+radial-gradient(circle at top left, rgba(255,255,255,.04), transparent 30%),
+#090909;
 color:white;
 line-height:1.6;
+overflow-x:hidden;
 }
 
 /* HEADER */
 
 header{
+position:sticky;
+top:0;
+z-index:1000;
+
 display:flex;
 justify-content:space-between;
 align-items:center;
+
 padding:25px 8%;
-background:#0b0b0b;
-position:sticky;
-top:0;
-z-index:100;
-border-bottom:1px solid #1f1f1f;
+
+background:rgba(10,10,10,.75);
+
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+border-bottom:1px solid rgba(255,255,255,.06);
 }
 
 .logo-area{
-font-size:2.6rem;
-font-weight:800;
-letter-spacing:6px;
-color:white;
+font-size:2.8rem;
+font-weight:900;
+letter-spacing:8px;
+cursor:default;
 }
 
 nav{
@@ -42,25 +53,46 @@ gap:35px;
 }
 
 nav a{
+color:#d5d5d5;
 text-decoration:none;
-color:#d7d7d7;
 font-weight:500;
 transition:.3s;
+position:relative;
 }
 
 nav a:hover{
 color:white;
 }
 
+nav a::after{
+content:'';
+position:absolute;
+left:0;
+bottom:-6px;
+
+width:0;
+height:2px;
+
+background:#6B1120;
+transition:.3s;
+}
+
+nav a:hover::after{
+width:100%;
+}
+
 /* HERO */
 
 .hero{
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
+
 padding:80px 8%;
+
+min-height:92vh;
+
 gap:80px;
-min-height:90vh;
 }
 
 .hero-text{
@@ -69,25 +101,77 @@ max-width:650px;
 
 .tag{
 display:inline-block;
-margin-bottom:20px;
-font-size:.9rem;
+
+padding:8px 14px;
+
+border:1px solid rgba(255,255,255,.08);
+
+background:rgba(255,255,255,.03);
+
+backdrop-filter:blur(12px);
+
+border-radius:999px;
+
+font-size:.8rem;
 letter-spacing:2px;
-color:#9c9c9c;
+
+margin-bottom:25px;
+
+color:#cfcfcf;
 }
 
 .hero-text h1{
-font-size:5rem;
-line-height:1;
+
+font-size:6rem;
+font-weight:900;
+
+line-height:.95;
+
 margin-bottom:25px;
-font-weight:800;
+
+background:
+linear-gradient(
+180deg,
+#ffffff,
+#d7d7d7
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
 .hero-text p{
 font-size:1.15rem;
-color:#c9c9c9;
+color:#bdbdbd;
 max-width:550px;
 margin-bottom:35px;
 }
+
+.btn{
+display:inline-block;
+
+padding:18px 38px;
+
+border-radius:12px;
+
+background:#6B1120;
+
+color:white;
+text-decoration:none;
+font-weight:700;
+
+transition:.35s;
+
+box-shadow:
+0 0 20px rgba(107,17,32,.45),
+0 0 50px rgba(107,17,32,.15);
+}
+
+.btn:hover{
+transform:translateY(-4px);
+}
+
+/* HERO IMAGE */
 
 .hero-image{
 display:flex;
@@ -96,89 +180,116 @@ align-items:center;
 }
 
 .hero-image img{
-width:100%;
+
 max-width:420px;
-border-radius:20px;
-transition:.4s;
+width:100%;
+
+border-radius:24px;
+
+transition:.5s;
+
+box-shadow:
+0 20px 60px rgba(0,0,0,.5);
 }
 
 .hero-image img:hover{
-transform:translateY(-10px);
+transform:
+translateY(-10px)
+rotate(-1deg);
 }
 
-/* BOTÕES */
-
-.btn{
-display:inline-block;
-background:#6B1120;
-padding:16px 34px;
-border-radius:10px;
-color:white;
-text-decoration:none;
-font-weight:600;
-transition:.3s;
-}
-
-.btn:hover{
-transform:translateY(-3px);
-}
-
-/* SEÇÕES */
+/* SECTIONS */
 
 section{
-padding:90px 8%;
+padding:100px 8%;
 }
 
 .section-title{
-margin-bottom:40px;
+margin-bottom:50px;
 }
 
 .section-title span{
 font-size:.8rem;
 letter-spacing:3px;
-color:#8e8e8e;
+color:#9c9c9c;
 }
 
 .section-title h2{
 font-size:3rem;
 margin-top:10px;
+position:relative;
+display:inline-block;
+}
+
+.section-title h2::after{
+content:'';
+
+display:block;
+
+width:80px;
+height:3px;
+
+margin-top:15px;
+
+background:#6B1120;
 }
 
 /* PRODUTOS */
 
 .grid-produtos{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:30px;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:35px;
 }
 
 .produto{
-background:#171717;
-border-radius:18px;
+
+background:
+linear-gradient(
+145deg,
+rgba(255,255,255,.05),
+rgba(255,255,255,.015)
+);
+
+border:1px solid rgba(255,255,255,.06);
+
+backdrop-filter:blur(15px);
+
+border-radius:22px;
+
 overflow:hidden;
+
 transition:
-transform .35s ease,
-box-shadow .35s ease;
+transform .45s ease,
+box-shadow .45s ease;
+
 cursor:pointer;
 }
 
 .produto:hover{
+
 transform:
-translateY(-10px)
-rotateX(5deg)
-rotateY(-5deg);
+perspective(1000px)
+rotateX(6deg)
+rotateY(-6deg)
+translateY(-12px);
 
 box-shadow:
-0 25px 50px rgba(0,0,0,.45);
+0 30px 60px rgba(0,0,0,.45);
 }
 
 .produto img{
 width:100%;
 display:block;
+transition:.6s;
+}
+
+.produto:hover img{
+transform:scale(1.05);
 }
 
 .produto h3{
-padding:20px;
+padding:22px;
 text-align:center;
 font-size:1rem;
 }
@@ -187,53 +298,79 @@ font-size:1rem;
 
 #sobre p{
 max-width:900px;
-margin-bottom:20px;
-color:#d0d0d0;
-line-height:1.8;
+color:#cfcfcf;
+margin-bottom:18px;
+line-height:1.9;
 }
 
 /* CONTATO */
 
 #contato p{
+color:#cfcfcf;
 margin-bottom:25px;
 }
 
 /* FOOTER */
 
 footer{
+
+padding:60px 20px;
+
 text-align:center;
-padding:50px 20px;
-border-top:1px solid #1f1f1f;
-color:#bdbdbd;
+
+border-top:1px solid rgba(255,255,255,.05);
+
+color:#bcbcbc;
 }
 
 footer p:first-child{
 margin-bottom:10px;
 }
 
-/* WHATSAPP */
+/* WHATSAPP FLOAT */
 
 .whatsapp-float{
+
 position:fixed;
-bottom:25px;
+
 right:25px;
-width:65px;
-height:65px;
+bottom:25px;
+
+width:70px;
+height:70px;
+
 border-radius:50%;
-background:#25D366;
+
 display:flex;
 justify-content:center;
 align-items:center;
+
+background:#111;
+
+border:1px solid rgba(255,255,255,.08);
+
+color:#25D366;
+
+font-size:32px;
+
 text-decoration:none;
-font-size:30px;
-color:white;
-box-shadow:0 8px 20px rgba(0,0,0,.35);
-z-index:999;
+
+box-shadow:
+0 15px 40px rgba(0,0,0,.4);
+
 transition:.3s;
+
+z-index:9999;
 }
 
 .whatsapp-float:hover{
-transform:scale(1.1);
+
+transform:
+translateY(-4px)
+scale(1.08);
+
+box-shadow:
+0 0 25px rgba(37,211,102,.25);
 }
 
 /* MOBILE */
@@ -253,7 +390,7 @@ justify-content:center;
 .hero{
 flex-direction:column;
 text-align:center;
-padding-top:40px;
+padding-top:50px;
 }
 
 .hero-text{
@@ -263,7 +400,7 @@ align-items:center;
 }
 
 .hero-text h1{
-font-size:3rem;
+font-size:3.5rem;
 }
 
 .hero-image img{
@@ -271,10 +408,12 @@ max-width:320px;
 }
 
 .section-title h2{
-font-size:2rem;
+font-size:2.2rem;
 }
 
 .logo-area{
 font-size:2rem;
+letter-spacing:4px;
 }
+
 }
