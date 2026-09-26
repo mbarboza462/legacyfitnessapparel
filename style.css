@@ -262,17 +262,14 @@ max-width:380px;
 
 border-radius:24px;
 
+opacity:1;
+
 transition:
 opacity .6s ease,
 transform .5s ease;
 
 box-shadow:
 0 25px 60px rgba(0,0,0,.45);
-
-}
-.hero-image img:hover{
-
-transform:translateY(-10px);
 
 }
 
