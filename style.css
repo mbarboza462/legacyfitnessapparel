@@ -27,9 +27,8 @@ transparent 25%),
 #050505;
 
 color:white;
-
-overflow-x:hidden;
 line-height:1.7;
+overflow-x:hidden;
 }
 
 /* =========================
@@ -46,7 +45,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 
-padding:15px 8%;
+padding:12px 8%;
 
 background:#050505;
 
@@ -55,10 +54,17 @@ border-bottom:
 
 }
 
+/* LOGO RESPONSIVA */
+
+.logo-area{
+display:flex;
+align-items:center;
+}
+
 .logo-area img{
 
-height:110px;
-width:auto;
+width:min(320px,32vw);
+height:auto;
 
 display:block;
 
@@ -68,9 +74,11 @@ transition:.3s ease;
 
 .logo-area img:hover{
 
-transform:scale(1.03);
+transform:scale(1.02);
 
 }
+
+/* MENU */
 
 nav{
 
@@ -87,9 +95,9 @@ color:rgba(255,255,255,.75);
 
 font-weight:500;
 
-transition:.3s;
-
 position:relative;
+
+transition:.3s;
 
 }
 
@@ -130,14 +138,14 @@ HERO
 .hero{
 
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
 
 gap:80px;
 
 padding:80px 8%;
 
-min-height:85vh;
+min-height:80vh;
 
 }
 
@@ -173,11 +181,11 @@ margin-bottom:25px;
 
 .hero-text h1{
 
-font-size:6rem;
-
-line-height:.95;
+font-size:clamp(3.5rem,8vw,6rem);
 
 font-weight:900;
+
+line-height:.95;
 
 margin-bottom:25px;
 
@@ -195,9 +203,9 @@ linear-gradient(
 
 .hero-text p{
 
-color:#bdbdbd;
-
 font-size:1.1rem;
+
+color:#bdbdbd;
 
 margin-bottom:35px;
 
@@ -230,13 +238,14 @@ box-shadow:
 
 .btn:hover{
 
-transform:
-translateY(-4px);
+transform:translateY(-4px);
 
 box-shadow:
 0 0 30px rgba(107,17,32,.55);
 
 }
+
+/* HERO IMAGE */
 
 .hero-image{
 
@@ -262,8 +271,7 @@ box-shadow:
 
 .hero-image img:hover{
 
-transform:
-translateY(-10px);
+transform:translateY(-10px);
 
 }
 
@@ -328,16 +336,16 @@ background:#6B1120;
 
 .section-title p{
 
-color:#bdbdbd;
-
 max-width:650px;
+
+color:#bdbdbd;
 
 line-height:1.8;
 
 }
 
 /* =========================
-COLEÇÃO
+PRODUTOS
 ========================= */
 
 .grid-produtos{
@@ -422,7 +430,7 @@ SOBRE
 
 max-width:900px;
 
-color:#cfcfcf;
+color:#d0d0d0;
 
 margin-bottom:18px;
 
@@ -434,7 +442,7 @@ CONTATO
 
 #contato p{
 
-color:#cfcfcf;
+color:#d0d0d0;
 
 margin-bottom:30px;
 
@@ -527,24 +535,22 @@ MOBILE
 header{
 
 flex-direction:column;
-
 gap:20px;
 
 }
 
 .logo-area img{
 
-height:80px;
+width:220px;
 
 }
 
 nav{
 
 flex-wrap:wrap;
-
 justify-content:center;
 
-gap:20px;
+gap:18px;
 
 }
 
@@ -554,7 +560,7 @@ flex-direction:column;
 
 text-align:center;
 
-padding-top:50px;
+padding-top:40px;
 
 gap:50px;
 
@@ -568,12 +574,6 @@ align-items:center;
 
 }
 
-.hero-text h1{
-
-font-size:3.5rem;
-
-}
-
 .hero-image img{
 
 max-width:280px;
@@ -583,6 +583,21 @@ max-width:280px;
 .section-title h2{
 
 font-size:2rem;
+
+}
+
+section{
+
+padding:70px 8%;
+
+}
+
+.whatsapp-float{
+
+width:60px;
+height:60px;
+
+font-size:28px;
 
 }
 
