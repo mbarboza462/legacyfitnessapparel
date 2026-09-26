@@ -122,3 +122,36 @@ footer{
     }
 
 }
+.card img{
+    width:100%;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.hero{
+    background:linear-gradient(
+        rgba(0,0,0,.75),
+        rgba(0,0,0,.85)
+    );
+}
+
+.logo{
+    color:#c7a36a;
+}
+
+.btn-primary{
+    background:#6b1120;
+    transition:.3s;
+}
+
+.btn-primary:hover{
+    transform:translateY(-3px);
+}
+
+.card{
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
