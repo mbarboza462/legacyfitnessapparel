@@ -1,10 +1,8 @@
 const imagens = [
-
-"camisa 1.jpeg",
-"camisa 2.jpeg",
-"camisa 3.jpeg",
-"camisa 4.jpeg"
-
+    "camisa 1.jpeg",
+    "camisa 2.jpeg",
+    "camisa 3.jpeg",
+    "camisa 4.jpeg"
 ];
 
 let atual = 0;
@@ -13,14 +11,20 @@ const heroImage = document.getElementById("hero-shirt");
 
 setInterval(() => {
 
-atual++;
+    heroImage.style.opacity = "0";
 
-if(atual >= imagens.length){
+    setTimeout(() => {
 
-atual = 0;
+        atual++;
 
-}
+        if (atual >= imagens.length) {
+            atual = 0;
+        }
 
-heroImage.src = imagens[atual];
+        heroImage.src = imagens[atual];
 
-}, 3000);
+        heroImage.style.opacity = "1";
+
+    }, 300);
+
+}, 4000);
