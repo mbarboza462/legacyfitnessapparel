@@ -328,6 +328,14 @@ function iniciarPaginaProduto() {
 
     let tamanhoEscolhido = "";
 
+    /* Produtos de tamanho único já chegam com a opção marcada */
+
+    const jaAtivo = bloco.querySelector(".tamanho-btn.ativo");
+
+    if (jaAtivo) {
+        tamanhoEscolhido = jaAtivo.getAttribute("data-tamanho");
+    }
+
     botoesTamanho.forEach(botao => {
 
         botao.addEventListener("click", () => {
@@ -730,6 +738,8 @@ function montarDrawer() {
                 '<a class="drawer-link" href="' + destino("essentials") + '">Essentials</a>' +
 
                 '<a class="drawer-link" href="' + destino("feminina") + '">Feminina</a>' +
+
+                '<a class="drawer-link" href="' + destino("acessorios") + '">Acessórios</a>' +
 
             '</div>' +
 
