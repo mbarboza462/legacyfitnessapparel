@@ -1,10 +1,6 @@
 const imagens = [
 
-    "camisa 1.jpeg",
     "camisa 2.jpeg",
-    "camisa 3.jpeg",
-    "camisa 4.jpeg",
-    "camisa 5.jpeg",
     "camisa tradicional off.jpeg",
     "camisa tradicional preto.jpeg"
 
