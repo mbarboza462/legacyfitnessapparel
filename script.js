@@ -896,7 +896,223 @@ function montarDrawer() {
 
 
 /* =========================================================
-8. INICIALIZAÇÃO
+8. RECOMENDADOS PARA VOCÊ
+========================================================= */
+
+/* Catálogo único do site. "oculto" marca páginas que ainda
+   existem mas foram substituídas e não devem ser sugeridas. */
+
+const CATALOGO = [
+
+    { nome: "Berserk", pagina: "berserk.html", imagem: "camisa 1.jpeg", colecao: "drop01" },
+    { nome: "Bulking", pagina: "bulking.html", imagem: "camisa 3.jpeg", colecao: "drop01" },
+    { nome: "One More Rep", pagina: "onemorerep.html", imagem: "camisa 4.jpeg", colecao: "drop01" },
+    { nome: "Gym Study Sleep Repeat", pagina: "gymstudy.html", imagem: "camisa 2.jpeg", colecao: "drop01" },
+    { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01" },
+    { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01" },
+
+    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials" },
+    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials" },
+
+    { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina" },
+    { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina" },
+
+    { nome: "Strap Oficial Legacy", pagina: "strap-legacy.html", imagem: "strap legacy.jpeg", colecao: "acessorios" },
+
+    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", oculto: true },
+    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", oculto: true }
+
+];
+
+const RECOMENDADOS_QTD = 4;
+
+/* Ordem usada para complementar com outras coleções */
+
+const ORDEM_COMPLEMENTO = ["essentials", "acessorios", "feminina", "drop01"];
+
+
+/* Monta a lista: primeiro vizinhos da mesma coleção, depois uma
+   peça de cada outra coleção, e por fim o que restar. */
+
+function escolherRecomendados(atual) {
+
+    const sugeriveis = CATALOGO.filter(p =>
+        !p.oculto && p.pagina !== atual.pagina
+    );
+
+    const escolhidos = [];
+
+    const juntar = item => {
+
+        if (item && escolhidos.length < RECOMENDADOS_QTD &&
+            !escolhidos.includes(item)) {
+
+            escolhidos.push(item);
+
+        }
+
+    };
+
+    /* Até duas peças da mesma coleção, a partir da posição atual */
+
+    const mesma = sugeriveis.filter(p => p.colecao === atual.colecao);
+
+    if (mesma.length > 0) {
+
+        const todas = CATALOGO.filter(p => p.colecao === atual.colecao);
+
+        const inicio = Math.max(0, todas.findIndex(p => p.pagina === atual.pagina));
+
+        for (let i = 1; i <= todas.length && escolhidos.length < 2; i++) {
+
+            const candidato = todas[(inicio + i) % todas.length];
+
+            if (mesma.includes(candidato)) {
+                juntar(candidato);
+            }
+
+        }
+
+    }
+
+    /* Uma peça de cada outra coleção, em rodízio */
+
+    const outras = ORDEM_COMPLEMENTO.filter(c => c !== atual.colecao);
+
+    const deslocamento = Math.max(0,
+        CATALOGO.findIndex(p => p.pagina === atual.pagina)
+    );
+
+    let rodada = 0;
+
+    while (escolhidos.length < RECOMENDADOS_QTD && rodada < 4) {
+
+        let acrescentou = false;
+
+        outras.forEach(colecao => {
+
+            if (escolhidos.length >= RECOMENDADOS_QTD) {
+                return;
+            }
+
+            const doGrupo = sugeriveis.filter(p => p.colecao === colecao);
+
+            if (doGrupo.length === 0) {
+                return;
+            }
+
+            /* O deslocamento faz cada página sugerir uma peça
+               diferente das coleções vizinhas */
+
+            let disponivel = null;
+
+            for (let i = 0; i < doGrupo.length; i++) {
+
+                const candidato = doGrupo[(deslocamento + rodada + i) % doGrupo.length];
+
+                if (!escolhidos.includes(candidato)) {
+                    disponivel = candidato;
+                    break;
+                }
+
+            }
+
+            if (disponivel) {
+                juntar(disponivel);
+                acrescentou = true;
+            }
+
+        });
+
+        if (!acrescentou) {
+            break;
+        }
+
+        rodada++;
+
+    }
+
+    /* Completa com qualquer peça restante */
+
+    sugeriveis.forEach(juntar);
+
+    return escolhidos;
+
+}
+
+
+function montarRecomendados() {
+
+    const bloco = document.querySelector("[data-produto]");
+
+    const detalhe = document.querySelector("section.produto-detalhe");
+
+    if (!bloco || !detalhe || document.getElementById("recomendados")) {
+        return;
+    }
+
+    const pagina = bloco.getAttribute("data-pagina");
+
+    let atual = CATALOGO.find(p => p.pagina === pagina);
+
+    if (!atual) {
+
+        atual = {
+            pagina: pagina,
+            colecao: "drop01"
+        };
+
+    }
+
+    const lista = escolherRecomendados(atual);
+
+    if (lista.length === 0) {
+        return;
+    }
+
+    const secao = document.createElement("section");
+
+    secao.id = "recomendados";
+
+    secao.className = "recomendados";
+
+    secao.innerHTML = '' +
+
+        '<div class="section-title">' +
+
+            '<span>VOCÊ TAMBÉM PODE GOSTAR</span>' +
+
+            '<h2>RECOMENDADOS PARA VOCÊ</h2>' +
+
+        '</div>' +
+
+        '<div class="recomendados-trilha">' +
+
+            lista.map(item =>
+
+                '<a href="' + escapar(item.pagina) + '" class="produto">' +
+
+                    '<img src="' + escapar(item.imagem) + '" alt="' + escapar(item.nome) + '" loading="lazy">' +
+
+                    '<div class="produto-info">' +
+
+                        '<h3>' + escapar(item.nome) + '</h3>' +
+
+                    '</div>' +
+
+                '</a>'
+
+            ).join("") +
+
+        '</div>';
+
+    detalhe.insertAdjacentElement("afterend", secao);
+
+}
+
+
+/* =========================================================
+9. INICIALIZAÇÃO
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -908,5 +1124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     iniciarPaginaProduto();
 
     iniciarPaginaCarrinho();
+
+    montarRecomendados();
 
 });

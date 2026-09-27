@@ -2835,3 +2835,180 @@ width:min(190px,40vw);
 }
 
 }
+
+/* =========================
+RECOMENDADOS PARA VOCÊ
+========================= */
+
+.recomendados{
+
+padding-top:0;
+
+border-top:
+1px solid rgba(255,255,255,.05);
+
+margin-top:20px;
+
+}
+
+.recomendados .section-title{
+
+margin-bottom:38px;
+
+padding-top:70px;
+
+}
+
+.recomendados .section-title h2{
+
+font-size:1.9rem;
+
+letter-spacing:1px;
+
+margin-bottom:0;
+
+}
+
+.recomendados .section-title h2::after{
+
+margin-top:18px;
+
+}
+
+.recomendados-trilha{
+
+display:grid;
+
+grid-template-columns:
+repeat(4,1fr);
+
+gap:28px;
+
+}
+
+/* Os cards reaproveitam a classe .produto, então o hover,
+   a borda e a sombra são exatamente os da grade de coleção. */
+
+.recomendados-trilha .produto-info{
+
+padding:20px 18px;
+
+}
+
+.recomendados-trilha .produto-info h3{
+
+margin-bottom:0;
+
+font-size:1rem;
+
+}
+
+/* =========================
+RECOMENDADOS — TABLET
+========================= */
+
+@media(max-width:1100px) and (min-width:901px){
+
+.recomendados-trilha{
+
+grid-template-columns:
+repeat(2,1fr);
+
+gap:24px;
+
+}
+
+}
+
+/* =========================
+RECOMENDADOS — MOBILE
+=========================
+
+Vira carrossel horizontal, arrastável, com encaixe por card
+e sem barra de rolagem visível.
+*/
+
+@media(max-width:900px){
+
+.recomendados .section-title{
+
+padding-top:55px;
+
+margin-bottom:28px;
+
+}
+
+.recomendados .section-title h2{
+
+font-size:1.5rem;
+
+}
+
+.recomendados-trilha{
+
+display:flex;
+
+grid-template-columns:none;
+
+gap:16px;
+
+overflow-x:auto;
+
+overflow-y:hidden;
+
+scroll-snap-type:x mandatory;
+
+/* Sem isto o encaixe engole a margem lateral e o primeiro
+   card encosta na borda da tela */
+
+scroll-padding-left:8%;
+
+scroll-behavior:smooth;
+
+-webkit-overflow-scrolling:touch;
+
+overscroll-behavior-x:contain;
+
+scrollbar-width:none;
+
+-ms-overflow-style:none;
+
+padding-bottom:6px;
+
+/* Sangra até a borda da tela e devolve o respiro interno */
+
+margin-left:-8%;
+
+margin-right:-8%;
+
+padding-left:8%;
+
+padding-right:8%;
+
+}
+
+.recomendados-trilha::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.recomendados-trilha .produto{
+
+flex:0 0 72%;
+
+max-width:280px;
+
+scroll-snap-align:start;
+
+}
+
+/* No toque o realce de hover não se aplica */
+
+.recomendados-trilha .produto:hover{
+
+transform:none;
+
+}
+
+}
