@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Carrinho | Legacy Fitness Apparel</title>
+
+<meta name="description"
+content="Carrinho de compras da Legacy Fitness Apparel">
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"
+rel="stylesheet">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo-area">
+
+<a href="index.html">
+
+<img src="logo.jpeg" alt="Legacy Fitness Apparel">
+
+</a>
+
+</div>
+
+<nav>
+
+<a href="index.html">Início</a>
+
+<a href="index.html#colecao">Coleção</a>
+
+<a href="index.html#sobre">Sobre</a>
+
+<a href="index.html#contato">Contato</a>
+
+<a href="carrinho.html" class="nav-carrinho">
+
+🛒 Carrinho
+<span class="carrinho-contador" data-cart-count>0</span>
+
+</a>
+
+</nav>
+
+</header>
+
+<section id="carrinho">
+
+<div class="section-title">
+
+<span>SEU PEDIDO</span>
+
+<h2>Carrinho</h2>
+
+<p>
+Confira as peças selecionadas e finalize seu pedido
+diretamente pelo WhatsApp.
+</p>
+
+</div>
+
+<div id="carrinho-vazio" class="carrinho-vazio" style="display:none">
+
+<p>
+Seu carrinho ainda está vazio.
+</p>
+
+<a href="index.html#colecao" class="btn">
+
+Ver Coleção
+
+</a>
+
+</div>
+
+<div id="carrinho-conteudo" class="carrinho-lista"></div>
+
+<div id="carrinho-resumo" class="carrinho-resumo" style="display:none">
+
+<span id="carrinho-total" class="carrinho-total">Total: 0 peças</span>
+
+<div class="carrinho-acoes">
+
+<button type="button" id="carrinho-limpar" class="btn-limpar">
+
+Limpar Carrinho
+
+</button>
+
+<button type="button" id="carrinho-finalizar" class="btn btn-finalizar">
+
+Finalizar Pedido
+
+</button>
+
+</div>
+
+</div>
+
+<br>
+
+<a href="index.html#colecao" class="btn-voltar">
+
+← Continuar comprando
+
+</a>
+
+</section>
+
+<footer>
+
+<p>
+© Legacy Fitness Apparel
+</p>
+
+<p>
+Treine. Supere. Deixe seu legado.
+</p>
+
+</footer>
+
+<a
+href="https://wa.me/5571986201642"
+target="_blank"
+class="whatsapp-float">
+
+💬
+
+</a>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

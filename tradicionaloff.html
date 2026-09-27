@@ -42,6 +42,13 @@ rel="stylesheet">
 
 <a href="index.html#contato">Contato</a>
 
+<a href="carrinho.html" class="nav-carrinho">
+
+🛒 Carrinho
+<span class="carrinho-contador" data-cart-count>0</span>
+
+</a>
+
 </nav>
 
 </header>
@@ -55,7 +62,10 @@ alt="Tradicional Off">
 
 </div>
 
-<div class="produto-detalhe-info">
+<div class="produto-detalhe-info"
+data-produto="Tradicional Off White"
+data-imagem="camisa tradicional off.jpeg"
+data-pagina="tradicionaloff.html">
 
 <span class="produto-tag">
 
@@ -94,6 +104,32 @@ Porque elegância também está nos detalhes.
 
 </div>
 
+<div class="tamanhos">
+
+<span class="tamanhos-label">Escolha o tamanho</span>
+
+<div class="tamanhos-opcoes">
+
+<button type="button" class="tamanho-btn" data-tamanho="P" aria-pressed="false">P</button>
+
+<button type="button" class="tamanho-btn" data-tamanho="M" aria-pressed="false">M</button>
+
+<button type="button" class="tamanho-btn" data-tamanho="G" aria-pressed="false">G</button>
+
+<button type="button" class="tamanho-btn" data-tamanho="GG" aria-pressed="false">GG</button>
+
+</div>
+
+</div>
+
+<div class="produto-acoes">
+
+<button type="button" class="btn-carrinho">
+
+Adicionar ao Carrinho
+
+</button>
+
 <a href="https://wa.me/5571986201642"
 target="_blank"
 class="btn">
@@ -102,7 +138,7 @@ Solicitar pelo WhatsApp
 
 </a>
 
-<br><br>
+</div>
 
 <a href="index.html#colecao"
 class="btn-voltar">
@@ -135,6 +171,8 @@ class="whatsapp-float">
 💬
 
 </a>
+
+<script src="script.js"></script>
 
 </body>
 
