@@ -727,9 +727,9 @@ function montarDrawer() {
 
                 '<a class="drawer-link" href="' + destino("colecao") + '">Drop 01</a>' +
 
-                '<span class="drawer-link drawer-link-breve">Essential<em>Em breve</em></span>' +
+                '<a class="drawer-link" href="' + destino("essentials") + '">Essentials</a>' +
 
-                '<span class="drawer-link drawer-link-breve">Feminina<em>Em breve</em></span>' +
+                '<a class="drawer-link" href="' + destino("feminina") + '">Feminina</a>' +
 
             '</div>' +
 
