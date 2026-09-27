@@ -592,7 +592,9 @@ SOBRE PREMIUM
 
 max-width:900px;
 
-margin-bottom:50px;
+margin:0 auto 60px auto;
+
+text-align:center;
 
 }
 
@@ -613,7 +615,7 @@ line-height:1.9;
 display:grid;
 
 grid-template-columns:
-repeat(auto-fit,minmax(240px,1fr));
+repeat(auto-fit,minmax(260px,1fr));
 
 gap:30px;
 
@@ -627,32 +629,41 @@ margin-top:20px;
 
 position:relative;
 
-padding:35px 28px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+
+text-align:center;
+
+padding:40px 30px;
+
+min-height:320px;
 
 border-radius:24px;
 
 background:
 linear-gradient(
 145deg,
-rgba(255,255,255,.05),
+rgba(255,255,255,.06),
 rgba(255,255,255,.015)
 );
 
 border:
-1px solid rgba(255,255,255,.06);
+1px solid rgba(255,255,255,.08);
 
 overflow:hidden;
+
+backdrop-filter:blur(12px);
 
 transition:
 transform .35s ease,
 box-shadow .35s ease,
 border-color .35s ease;
 
-backdrop-filter:blur(12px);
-
 }
 
-/* BRILHO NO TOPO */
+/* BRILHO SUPERIOR */
 
 .sobre-card::before{
 
@@ -664,33 +675,34 @@ top:0;
 left:0;
 
 width:100%;
-height:1px;
+height:2px;
 
 background:
 linear-gradient(
 90deg,
 transparent,
-rgba(255,255,255,.4),
+rgba(255,255,255,.5),
 transparent
 );
 
-opacity:.4;
+opacity:.5;
 
 }
 
-/* HOVER */
+/* EFEITO HOVER */
 
 .sobre-card:hover{
 
 transform:
-translateY(-10px);
+translateY(-12px)
+scale(1.02);
 
 border-color:
-rgba(107,17,32,.45);
+rgba(107,17,32,.55);
 
 box-shadow:
-0 20px 50px rgba(0,0,0,.45),
-0 0 25px rgba(107,17,32,.18);
+0 25px 60px rgba(0,0,0,.55),
+0 0 35px rgba(107,17,32,.30);
 
 }
 
@@ -698,28 +710,31 @@ box-shadow:
 
 .sobre-icon{
 
-width:70px;
-height:70px;
+width:80px;
+height:80px;
 
 display:flex;
 align-items:center;
 justify-content:center;
 
-border-radius:18px;
+margin:0 auto 25px auto;
 
-margin-bottom:25px;
+border-radius:20px;
 
-font-size:2rem;
+font-size:2.2rem;
 
 background:
 linear-gradient(
 145deg,
-rgba(107,17,32,.35),
-rgba(107,17,32,.08)
+rgba(107,17,32,.45),
+rgba(107,17,32,.12)
 );
 
 border:
 1px solid rgba(255,255,255,.08);
+
+box-shadow:
+0 10px 30px rgba(107,17,32,.25);
 
 }
 
@@ -727,13 +742,15 @@ border:
 
 .sobre-card h3{
 
-font-size:1.3rem;
+font-size:1.35rem;
 
 font-weight:700;
 
-margin-bottom:12px;
+margin-bottom:15px;
 
 color:white;
+
+text-align:center;
 
 }
 
@@ -746,6 +763,12 @@ color:#bdbdbd;
 line-height:1.8;
 
 font-size:.95rem;
+
+max-width:260px;
+
+margin:0 auto;
+
+text-align:center;
 
 }
 
@@ -763,16 +786,18 @@ gap:20px;
 
 .sobre-card{
 
-padding:28px 24px;
+min-height:auto;
+
+padding:30px 25px;
 
 }
 
 .sobre-icon{
 
-width:60px;
-height:60px;
+width:65px;
+height:65px;
 
-font-size:1.7rem;
+font-size:1.8rem;
 
 }
 
