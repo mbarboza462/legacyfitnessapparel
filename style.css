@@ -2660,3 +2660,178 @@ margin-right:auto;
 }
 
 }
+
+/* =========================
+CABEÇALHO REFORMULADO
+=========================
+
+Desktop: MENU e logo agrupados à esquerda, carrinho à direita.
+Mobile:  MENU | LOGO | CARRINHO em uma única linha, logo centralizada.
+Os links de navegação passam a existir apenas no menu lateral.
+*/
+
+header{
+
+justify-content:flex-start;
+
+gap:28px;
+
+padding:14px 6%;
+
+}
+
+header .logo-area{
+
+margin-right:auto;
+
+}
+
+.logo-area img{
+
+width:min(360px,30vw);
+
+}
+
+header nav{
+
+gap:0;
+
+}
+
+/* =========================
+CABEÇALHO — MOBILE
+========================= */
+
+@media(max-width:900px){
+
+header{
+
+display:grid;
+
+grid-template-columns:
+minmax(0,1fr) auto minmax(0,1fr);
+
+align-items:center;
+
+flex-direction:row;
+
+gap:10px;
+
+padding:12px 4%;
+
+}
+
+header .drawer-abrir{
+
+justify-self:start;
+
+order:0;
+
+padding:9px 14px;
+
+font-size:.7rem;
+
+letter-spacing:1.5px;
+
+gap:7px;
+
+}
+
+header .logo-area{
+
+justify-self:center;
+
+margin-right:0;
+
+}
+
+.logo-area img{
+
+width:min(190px,36vw);
+
+}
+
+header nav{
+
+justify-self:end;
+
+flex-wrap:nowrap;
+
+justify-content:flex-end;
+
+gap:0;
+
+}
+
+/* No mobile o carrinho fica compacto, apenas ícone e contador.
+   O rótulo é ocultado e o ícone reposto por pseudoelemento. */
+
+nav a.nav-carrinho{
+
+order:0;
+
+gap:6px;
+
+padding:8px 12px;
+
+font-size:0;
+
+}
+
+nav a.nav-carrinho::before{
+
+content:'🛒';
+
+font-size:1rem;
+
+line-height:1;
+
+}
+
+nav a.nav-carrinho .carrinho-contador{
+
+font-size:.72rem;
+
+min-width:20px;
+
+padding:1px 6px;
+
+}
+
+}
+
+/* Telas muito estreitas */
+
+@media(max-width:400px){
+
+header{
+
+gap:6px;
+
+padding:12px 3%;
+
+}
+
+header .drawer-abrir{
+
+padding:9px 11px;
+
+font-size:0;
+
+gap:0;
+
+}
+
+header .drawer-abrir .drawer-abrir-icone{
+
+font-size:1.05rem;
+
+}
+
+.logo-area img{
+
+width:min(190px,40vw);
+
+}
+
+}

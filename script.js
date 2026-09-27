@@ -667,13 +667,15 @@ function destino(ancora) {
 
 function montarDrawer() {
 
+    const cabecalho = document.querySelector("header");
+
     const nav = document.querySelector("header nav");
 
-    if (!nav || document.getElementById("legacy-drawer")) {
+    if (!cabecalho || !nav || document.getElementById("legacy-drawer")) {
         return;
     }
 
-    /* Botão de abertura, inserido no início do menu */
+    /* Botão de abertura, à esquerda da logo no cabeçalho */
 
     const abrir = document.createElement("button");
 
@@ -691,7 +693,7 @@ function montarDrawer() {
 
     abrir.innerHTML = '<span class="drawer-abrir-icone" aria-hidden="true">☰</span> MENU';
 
-    nav.insertBefore(abrir, nav.firstChild);
+    cabecalho.insertBefore(abrir, cabecalho.firstChild);
 
     /* Fundo escurecido */
 
