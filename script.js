@@ -642,10 +642,254 @@ function iniciarPaginaCarrinho() {
 
 
 /* =========================================================
-7. INICIALIZAÇÃO
+7. MENU LATERAL (DRAWER)
+========================================================= */
+
+/* Resolve o destino de uma âncora conforme a página atual.
+   Na home usa a âncora direta; nas internas aponta para o index. */
+
+function destino(ancora) {
+
+    return document.getElementById(ancora)
+        ? "#" + ancora
+        : "index.html#" + ancora;
+
+}
+
+
+function montarDrawer() {
+
+    const nav = document.querySelector("header nav");
+
+    if (!nav || document.getElementById("legacy-drawer")) {
+        return;
+    }
+
+    /* Botão de abertura, inserido no início do menu */
+
+    const abrir = document.createElement("button");
+
+    abrir.type = "button";
+
+    abrir.id = "drawer-abrir";
+
+    abrir.className = "drawer-abrir";
+
+    abrir.setAttribute("aria-controls", "legacy-drawer");
+
+    abrir.setAttribute("aria-expanded", "false");
+
+    abrir.setAttribute("aria-label", "Abrir menu");
+
+    abrir.innerHTML = '<span class="drawer-abrir-icone" aria-hidden="true">☰</span> MENU';
+
+    nav.insertBefore(abrir, nav.firstChild);
+
+    /* Fundo escurecido */
+
+    const overlay = document.createElement("div");
+
+    overlay.id = "legacy-overlay";
+
+    overlay.className = "drawer-overlay";
+
+    /* Painel lateral */
+
+    const painel = document.createElement("aside");
+
+    painel.id = "legacy-drawer";
+
+    painel.className = "drawer";
+
+    painel.setAttribute("role", "dialog");
+
+    painel.setAttribute("aria-modal", "true");
+
+    painel.setAttribute("aria-label", "Menu de navegação");
+
+    painel.setAttribute("aria-hidden", "true");
+
+    painel.innerHTML = '' +
+
+        '<div class="drawer-topo">' +
+
+            '<span class="drawer-marca">LEGACY</span>' +
+
+            '<button type="button" class="drawer-fechar" aria-label="Fechar menu">✕</button>' +
+
+        '</div>' +
+
+        '<nav class="drawer-nav">' +
+
+            '<div class="drawer-grupo">' +
+
+                '<span class="drawer-grupo-titulo">Coleções</span>' +
+
+                '<a class="drawer-link" href="' + destino("colecao") + '">Drop 01</a>' +
+
+                '<span class="drawer-link drawer-link-breve">Essential<em>Em breve</em></span>' +
+
+                '<span class="drawer-link drawer-link-breve">Feminina<em>Em breve</em></span>' +
+
+            '</div>' +
+
+            '<div class="drawer-grupo">' +
+
+                '<a class="drawer-link drawer-link-forte" href="guia-tamanhos.html">Guia de Tamanhos</a>' +
+
+                '<a class="drawer-link drawer-link-forte" href="' + destino("sobre") + '">Sobre a Legacy</a>' +
+
+                '<a class="drawer-link drawer-link-forte" href="' + destino("contato") + '">Contato</a>' +
+
+            '</div>' +
+
+            '<div class="drawer-grupo">' +
+
+                '<a class="drawer-link drawer-link-carrinho" href="carrinho.html">' +
+                    '🛒 Carrinho <span class="carrinho-contador" data-cart-count>0</span>' +
+                '</a>' +
+
+            '</div>' +
+
+        '</nav>' +
+
+        '<div class="drawer-rodape">' +
+
+            '<p>Treine. Supere. Deixe seu legado.</p>' +
+
+        '</div>';
+
+    document.body.appendChild(overlay);
+
+    document.body.appendChild(painel);
+
+    atualizarContador();
+
+    let ultimoFoco = null;
+
+    function abrirDrawer() {
+
+        ultimoFoco = document.activeElement;
+
+        painel.classList.add("aberto");
+
+        overlay.classList.add("visivel");
+
+        painel.setAttribute("aria-hidden", "false");
+
+        abrir.setAttribute("aria-expanded", "true");
+
+        document.body.classList.add("drawer-travado");
+
+        const fechar = painel.querySelector(".drawer-fechar");
+
+        if (fechar) {
+            fechar.focus();
+        }
+
+    }
+
+    function fecharDrawer() {
+
+        if (!painel.classList.contains("aberto")) {
+            return;
+        }
+
+        painel.classList.remove("aberto");
+
+        overlay.classList.remove("visivel");
+
+        painel.setAttribute("aria-hidden", "true");
+
+        abrir.setAttribute("aria-expanded", "false");
+
+        document.body.classList.remove("drawer-travado");
+
+        if (ultimoFoco && typeof ultimoFoco.focus === "function") {
+            ultimoFoco.focus();
+        }
+
+    }
+
+    abrir.addEventListener("click", abrirDrawer);
+
+    /* Fecha ao clicar fora */
+
+    overlay.addEventListener("click", fecharDrawer);
+
+    /* Fecha ao clicar no X */
+
+    painel.querySelector(".drawer-fechar")
+        .addEventListener("click", fecharDrawer);
+
+    /* Fecha ao escolher um item */
+
+    painel.querySelectorAll("a.drawer-link").forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            /* Aguarda o salto da âncora antes de fechar */
+
+            setTimeout(fecharDrawer, 120);
+
+        });
+
+    });
+
+    /* Fecha com a tecla Esc */
+
+    document.addEventListener("keydown", evento => {
+
+        if (evento.key === "Escape") {
+            fecharDrawer();
+        }
+
+    });
+
+    /* Mantém o foco dentro do painel enquanto aberto */
+
+    painel.addEventListener("keydown", evento => {
+
+        if (evento.key !== "Tab") {
+            return;
+        }
+
+        const focaveis = painel.querySelectorAll("a[href], button");
+
+        if (focaveis.length === 0) {
+            return;
+        }
+
+        const primeiro = focaveis[0];
+
+        const ultimo = focaveis[focaveis.length - 1];
+
+        if (evento.shiftKey && document.activeElement === primeiro) {
+
+            evento.preventDefault();
+
+            ultimo.focus();
+
+        } else if (!evento.shiftKey && document.activeElement === ultimo) {
+
+            evento.preventDefault();
+
+            primeiro.focus();
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+8. INICIALIZAÇÃO
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    montarDrawer();
 
     atualizarContador();
 
