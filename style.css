@@ -13,6 +13,7 @@ scroll-behavior:smooth;
 }
 
 body{
+
 font-family:'Montserrat',sans-serif;
 
 background:
@@ -27,8 +28,11 @@ transparent 25%),
 #050505;
 
 color:white;
+
 line-height:1.7;
+
 overflow-x:hidden;
+
 }
 
 /* =========================
@@ -52,18 +56,25 @@ background:#050505;
 border-bottom:
 1px solid rgba(255,255,255,.05);
 
+backdrop-filter:blur(12px);
+
 }
 
-/* LOGO RESPONSIVA */
+/* =========================
+LOGO
+========================= */
 
 .logo-area{
+
 display:flex;
 align-items:center;
+
 }
 
 .logo-area img{
 
 width:min(320px,32vw);
+
 height:auto;
 
 display:block;
@@ -74,15 +85,18 @@ transition:.3s ease;
 
 .logo-area img:hover{
 
-transform:scale(1.02);
+transform:scale(1.03);
 
 }
 
-/* MENU */
+/* =========================
+MENU
+========================= */
 
 nav{
 
 display:flex;
+
 gap:35px;
 
 }
@@ -138,14 +152,16 @@ HERO
 .hero{
 
 display:flex;
+
 justify-content:space-between;
+
 align-items:center;
 
 gap:80px;
 
 padding:80px 8%;
 
-min-height:80vh;
+min-height:85vh;
 
 }
 
@@ -213,6 +229,10 @@ max-width:550px;
 
 }
 
+/* =========================
+BOTÕES
+========================= */
+
 .btn{
 
 display:inline-block;
@@ -241,11 +261,13 @@ box-shadow:
 transform:translateY(-4px);
 
 box-shadow:
-0 0 30px rgba(107,17,32,.55);
+0 0 35px rgba(107,17,32,.55);
 
 }
 
-/* HERO IMAGE */
+/* =========================
+HERO IMAGE
+========================= */
 
 .hero-image{
 
@@ -258,7 +280,8 @@ align-items:center;
 .hero-image img{
 
 width:100%;
-max-width:380px;
+
+max-width:420px;
 
 border-radius:24px;
 
@@ -270,6 +293,12 @@ transform .5s ease;
 
 box-shadow:
 0 25px 60px rgba(0,0,0,.45);
+
+}
+
+.hero-image img:hover{
+
+transform:translateY(-8px);
 
 }
 
@@ -343,7 +372,7 @@ line-height:1.8;
 }
 
 /* =========================
-PRODUTOS
+COLEÇÃO
 ========================= */
 
 .grid-produtos{
@@ -360,6 +389,7 @@ gap:35px;
 .produto{
 
 text-decoration:none;
+
 color:white;
 
 background:
@@ -379,6 +409,8 @@ overflow:hidden;
 transition:
 transform .4s ease,
 box-shadow .4s ease;
+
+position:relative;
 
 }
 
@@ -404,19 +436,148 @@ transition:.6s;
 
 .produto:hover img{
 
-transform:scale(1.05);
+transform:scale(1.06);
 
 }
 
-.produto h3{
+.produto-info{
 
 padding:22px;
 
-text-align:center;
+}
 
-font-size:1rem;
+.produto-info h3{
+
+font-size:1.1rem;
+
+font-weight:700;
+
+margin-bottom:8px;
+
+}
+
+.produto-info p{
+
+font-size:.9rem;
+
+color:#bdbdbd;
+
+line-height:1.6;
+
+}
+
+/* =========================
+PÁGINAS INTERNAS
+========================= */
+
+.produto-detalhe{
+
+display:grid;
+
+grid-template-columns:
+1fr 1fr;
+
+gap:70px;
+
+align-items:center;
+
+min-height:80vh;
+
+}
+
+.produto-detalhe-imagem{
+
+display:flex;
+justify-content:center;
+
+}
+
+.produto-detalhe-imagem img{
+
+width:100%;
+
+max-width:500px;
+
+border-radius:24px;
+
+box-shadow:
+0 25px 60px rgba(0,0,0,.45);
+
+}
+
+.produto-detalhe-info h1{
+
+font-size:clamp(2.5rem,5vw,4rem);
+
+font-weight:900;
+
+margin-bottom:25px;
+
+}
+
+.produto-tag{
+
+display:inline-block;
+
+padding:8px 16px;
+
+border-radius:999px;
+
+background:
+rgba(255,255,255,.04);
+
+border:
+1px solid rgba(255,255,255,.08);
+
+font-size:.75rem;
+
+letter-spacing:2px;
+
+margin-bottom:20px;
+
+}
+
+.produto-descricao{
+
+color:#cfcfcf;
+
+margin-bottom:30px;
+
+line-height:1.9;
+
+}
+
+.produto-especificacoes{
+
+margin-bottom:35px;
+
+}
+
+.produto-especificacoes p{
+
+margin-bottom:10px;
+
+color:#d8d8d8;
+
+}
+
+.btn-voltar{
+
+display:inline-block;
+
+text-decoration:none;
+
+color:#cfcfcf;
 
 font-weight:600;
+
+transition:.3s;
+
+}
+
+.btn-voltar:hover{
+
+color:white;
 
 }
 
@@ -533,6 +694,7 @@ MOBILE
 header{
 
 flex-direction:column;
+
 gap:20px;
 
 }
@@ -546,6 +708,7 @@ width:220px;
 nav{
 
 flex-wrap:wrap;
+
 justify-content:center;
 
 gap:18px;
@@ -567,7 +730,9 @@ gap:50px;
 .hero-text{
 
 display:flex;
+
 flex-direction:column;
+
 align-items:center;
 
 }
@@ -590,6 +755,22 @@ padding:70px 8%;
 
 }
 
+.produto-detalhe{
+
+grid-template-columns:1fr;
+
+text-align:center;
+
+gap:40px;
+
+}
+
+.produto-detalhe-imagem img{
+
+max-width:320px;
+
+}
+
 .whatsapp-float{
 
 width:60px;
@@ -598,21 +779,5 @@ height:60px;
 font-size:28px;
 
 }
-
-}
-
-.hero-modelo{
-
-margin-top:25px;
-
-font-size:1rem;
-
-font-weight:600;
-
-letter-spacing:2px;
-
-color:#bdbdbd;
-
-text-transform:uppercase;
 
 }
