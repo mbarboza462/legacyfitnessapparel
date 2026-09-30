@@ -90,6 +90,7 @@ function lerCarrinho() {
             pagina: typeof item.pagina === "string" ? item.pagina : "",
             preco: Number(item.preco) > 0 ? Number(item.preco) : 0,
             variante: typeof item.variante === "string" ? item.variante : "",
+            acessorio: typeof item.acessorio === "string" ? item.acessorio : "",
             quantidade: Number(item.quantidade) > 0 ? Math.floor(Number(item.quantidade)) : 1
         }));
 
@@ -184,7 +185,8 @@ function adicionarAoCarrinho(produto) {
     const existente = itens.find(item =>
         item.nome === produto.nome &&
         item.tamanho === produto.tamanho &&
-        item.variante === (produto.variante || "")
+        item.variante === (produto.variante || "") &&
+        item.acessorio === (produto.acessorio || "")
     );
 
     if (existente) {
@@ -200,6 +202,7 @@ function adicionarAoCarrinho(produto) {
             pagina: produto.pagina || "",
             preco: Number(produto.preco) > 0 ? Number(produto.preco) : 0,
             variante: produto.variante || "",
+            acessorio: produto.acessorio || "",
             quantidade: 1
         });
 
@@ -365,7 +368,7 @@ function iniciarBlocoProduto(bloco) {
 
     const preco = Number(bloco.getAttribute("data-preco")) || 0;
 
-    let imagem = bloco.getAttribute("data-imagem") || "";
+    const imagem = bloco.getAttribute("data-imagem") || "";
 
     const pagina = bloco.getAttribute("data-pagina") || "";
 
@@ -376,51 +379,6 @@ function iniciarBlocoProduto(bloco) {
     const botaoAdicionar = bloco.querySelector(".btn-carrinho");
 
     let tamanhoEscolhido = "";
-
-    /* Kits da home: o cliente escolhe qual camiseta leva junto */
-
-    let variante = "";
-
-    const selectCamiseta = bloco.querySelector(".kit-camiseta");
-
-    if (selectCamiseta) {
-
-        const publico = bloco.getAttribute("data-publico");
-
-        const camisetas = CATALOGO.filter(p =>
-            !p.kit && !p.oculto && p.publico === publico
-        );
-
-        selectCamiseta.innerHTML = camisetas.map(p =>
-            '<option value="' + escapar(p.nome) + '">' + escapar(p.nome) + '</option>'
-        ).join("");
-
-        const fotoCamiseta = bloco.querySelector(".kit-imagens img");
-
-        const aplicarCamiseta = () => {
-
-            const escolhida = camisetas.find(p => p.nome === selectCamiseta.value);
-
-            if (!escolhida) {
-                return;
-            }
-
-            variante = escolhida.nome;
-
-            imagem = escolhida.imagem;
-
-            if (fotoCamiseta) {
-                fotoCamiseta.src = escolhida.imagem;
-                fotoCamiseta.alt = escolhida.nome;
-            }
-
-        };
-
-        selectCamiseta.addEventListener("change", aplicarCamiseta);
-
-        aplicarCamiseta();
-
-    }
 
     /* Produtos de tamanho único já chegam com a opção marcada */
 
@@ -510,23 +468,21 @@ function iniciarBlocoProduto(bloco) {
             tamanho: tamanhoEscolhido,
             imagem: imagem,
             pagina: pagina,
-            preco: preco,
-            variante: variante
+            preco: preco
         });
 
         confirmar(botaoAdicionar);
 
-        mostrarAviso(
-            nome + (variante ? " (" + variante + ")" : "") +
-            " - " + tamanhoEscolhido + " adicionado ao carrinho."
-        );
+        mostrarAviso(nome + " - " + tamanhoEscolhido + " adicionado ao carrinho.");
 
     });
 
 }
 
 
-/* Bloco "Complete seu kit" dentro da página do produto */
+/* Bloco "Complete seu kit" dentro da página do produto: adiciona o
+   kit com a peça que o cliente já está vendo e leva à página do kit
+   para trocar camiseta ou acessório */
 
 function montarKitNaPagina(bloco, nome, imagem, pagina, lerTamanho, exigirTamanho, confirmar) {
 
@@ -542,18 +498,15 @@ function montarKitNaPagina(bloco, nome, imagem, pagina, lerTamanho, exigirTamanh
 
     caixa.className = "kit-upsell";
 
-    const strap = CATALOGO.find(p => p.colecao === "acessorios");
-
-    /* Página do Strap: leva o cliente aos kits que o incluem */
+    /* Página de acessório: apresenta os kits que o incluem */
 
     if (atual.colecao === "acessorios") {
 
         caixa.innerHTML = '' +
             '<div class="kit-upsell-texto">' +
                 '<span class="kit-upsell-rotulo">COMPLETE SEU KIT</span>' +
-                '<strong>Leve o Strap com uma camiseta Legacy</strong>' +
-                '<small>Starter Legacy e Legacy Feminine, ' +
-                formatarPreco(119.90) + ' cada.</small>' +
+                '<strong>Leve o ' + escapar(atual.nome) + ' com uma camiseta Legacy</strong>' +
+                '<small>Monte o Starter Legacy ou o Legacy Feminine.</small>' +
             '</div>' +
             '<a class="kit-upsell-botao" href="index.html#kits">Ver kits</a>';
 
@@ -563,52 +516,267 @@ function montarKitNaPagina(bloco, nome, imagem, pagina, lerTamanho, exigirTamanh
 
     }
 
-    const publico = atual.colecao === "feminina" ? "feminino" : "masculino";
+    const acessorio = CATALOGO.find(p => p.colecao === "acessorios");
 
-    const kit = CATALOGO.find(p => p.kit && p.publico === publico);
+    const kits = CATALOGO.filter(p =>
+        p.kit && p.aceita.includes(atual.publico)
+    );
 
-    if (!kit || !strap) {
+    if (kits.length === 0 || !acessorio) {
         return;
     }
 
-    caixa.innerHTML = '' +
-        '<div class="kit-upsell-imagens">' +
-            '<img src="' + escapar(imagem) + '" alt="' + escapar(nome) + '">' +
-            '<img src="' + escapar(strap.imagem) + '" alt="' + escapar(strap.nome) + '">' +
-        '</div>' +
-        '<div class="kit-upsell-texto">' +
-            '<span class="kit-upsell-rotulo">COMPLETE SEU KIT</span>' +
-            '<strong>' + escapar(kit.nome) + ' · ' + formatarPreco(kit.preco) + '</strong>' +
-            '<small>Esta camiseta + Strap Oficial Legacy, no tamanho escolhido acima.</small>' +
-        '</div>' +
-        '<button type="button" class="kit-upsell-botao">Adicionar kit</button>';
+    caixa.classList.add("kit-upsell-lista");
+
+    caixa.innerHTML = kits.map((kit, i) =>
+        '<div class="kit-upsell-linha">' +
+            '<div class="kit-upsell-imagens">' +
+                '<img src="' + escapar(imagem) + '" alt="' + escapar(nome) + '">' +
+                '<img src="' + escapar(acessorio.imagem) + '" alt="' + escapar(acessorio.nome) + '">' +
+            '</div>' +
+            '<div class="kit-upsell-texto">' +
+                '<span class="kit-upsell-rotulo">COMPLETE SEU KIT</span>' +
+                '<strong>' + escapar(kit.nome) + ' · ' + formatarPreco(kit.preco) + '</strong>' +
+                '<small>Esta camiseta + ' + escapar(acessorio.nome) + ', no tamanho escolhido acima. ' +
+                '<a href="' + escapar(kit.pagina) + '?camiseta=' + encodeURIComponent(nome) + '">Trocar camiseta ou acessório</a></small>' +
+            '</div>' +
+            '<button type="button" class="kit-upsell-botao" data-indice="' + i + '">Adicionar kit</button>' +
+        '</div>'
+    ).join("");
 
     acoes.insertAdjacentElement("afterend", caixa);
 
-    const botao = caixa.querySelector(".kit-upsell-botao");
+    caixa.querySelectorAll(".kit-upsell-botao").forEach(botao => {
 
-    botao.addEventListener("click", () => {
+        botao.addEventListener("click", () => {
 
-        if (!exigirTamanho()) {
+            if (!exigirTamanho()) {
+                return;
+            }
+
+            const kit = kits[Number(botao.getAttribute("data-indice"))];
+
+            const tamanho = lerTamanho();
+
+            adicionarAoCarrinho({
+                nome: kit.nome,
+                tamanho: tamanho,
+                imagem: imagem,
+                pagina: kit.pagina,
+                preco: kit.preco,
+                variante: nome,
+                acessorio: acessorio.nome
+            });
+
+            confirmar(botao);
+
+            mostrarAviso(kit.nome + " (" + nome + ") - " + tamanho + " adicionado ao carrinho.");
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+5B. PÁGINA DO KIT
+========================================================= */
+
+/* Camisetas que o kit aceita: as do público do kit e as unissex */
+
+function camisetasDoKit(kit) {
+
+    /* Peças do público do kit primeiro, unissex depois */
+
+    return CATALOGO.filter(p =>
+        !p.kit && !p.oculto && p.colecao !== "acessorios" &&
+        kit.aceita.includes(p.publico)
+    ).sort((a, b) =>
+        (a.publico === "unissex") - (b.publico === "unissex")
+    );
+
+}
+
+
+function acessoriosDoKit() {
+
+    return CATALOGO.filter(p => !p.kit && p.colecao === "acessorios");
+
+}
+
+
+function iniciarPaginaKit() {
+
+    const bloco = document.querySelector("[data-kit]");
+
+    if (!bloco) {
+        return;
+    }
+
+    const kit = CATALOGO.find(p => p.kit && p.nome === bloco.getAttribute("data-kit"));
+
+    if (!kit) {
+        return;
+    }
+
+    const camisetas = camisetasDoKit(kit);
+
+    const acessorios = acessoriosDoKit();
+
+    const passoCamiseta = document.getElementById("kit-passo-camiseta");
+
+    const passoAcessorio = document.getElementById("kit-passo-acessorio");
+
+    const fotoCamiseta = document.getElementById("kit-foto-camiseta");
+
+    const fotoAcessorio = document.getElementById("kit-foto-acessorio");
+
+    const zonaTamanho = bloco.querySelector(".tamanhos");
+
+    const botoesTamanho = bloco.querySelectorAll(".tamanho-btn");
+
+    const botaoAdicionar = bloco.querySelector(".btn-carrinho");
+
+    const linkWhats = document.getElementById("kit-whatsapp");
+
+    if (camisetas.length === 0 || acessorios.length === 0) {
+        return;
+    }
+
+    /* A camiseta pode vir pré-escolhida pela página do produto */
+
+    const pedida = new URLSearchParams(window.location.search).get("camiseta");
+
+    let camiseta = camisetas.find(p => p.nome === pedida) || camisetas[0];
+
+    let acessorio = acessorios[0];
+
+    let tamanho = "";
+
+    const opcao = (item, tipo, ativo) =>
+        '<button type="button" class="kit-opcao' + (ativo ? ' ativo' : '') +
+        '" data-tipo="' + tipo + '" data-nome="' + escapar(item.nome) +
+        '" aria-pressed="' + (ativo ? "true" : "false") + '">' +
+            '<img src="' + escapar(item.imagem) + '" alt="" loading="lazy">' +
+            '<span>' + escapar(item.nome) + '</span>' +
+        '</button>';
+
+    const desenhar = () => {
+
+        passoCamiseta.querySelector(".kit-opcoes").innerHTML =
+            camisetas.map(p => opcao(p, "camiseta", p === camiseta)).join("");
+
+        /* Com um único acessório, ele é parte fixa do kit */
+
+        passoAcessorio.classList.toggle("kit-passo-fixo", acessorios.length === 1);
+
+        passoAcessorio.querySelector(".tamanhos-label").textContent =
+            acessorios.length === 1 ? "2. Acessório incluso" : "2. Escolha o acessório";
+
+        passoAcessorio.querySelector(".kit-opcoes").innerHTML =
+            acessorios.map(p => opcao(p, "acessorio", p === acessorio)).join("");
+
+        fotoCamiseta.src = camiseta.imagem;
+
+        fotoCamiseta.alt = camiseta.nome;
+
+        fotoAcessorio.src = acessorio.imagem;
+
+        fotoAcessorio.alt = acessorio.nome;
+
+        if (linkWhats) {
+
+            const texto =
+                "Olá! Tenho interesse no kit " + kit.nome + " com a camiseta " +
+                camiseta.nome + " e o " + acessorio.nome + ".\n" +
+                "Gostaria de verificar disponibilidade e tamanhos.";
+
+            linkWhats.href =
+                "https://wa.me/" + LEGACY_WHATSAPP + "?text=" + encodeURIComponent(texto);
+
+        }
+
+    };
+
+    bloco.addEventListener("click", evento => {
+
+        const botao = evento.target.closest(".kit-opcao");
+
+        if (!botao || !bloco.contains(botao)) {
             return;
         }
 
-        const tamanho = lerTamanho();
+        const nome = botao.getAttribute("data-nome");
+
+        if (botao.getAttribute("data-tipo") === "camiseta") {
+            camiseta = camisetas.find(p => p.nome === nome) || camiseta;
+        } else {
+            acessorio = acessorios.find(p => p.nome === nome) || acessorio;
+        }
+
+        desenhar();
+
+    });
+
+    botoesTamanho.forEach(botao => {
+
+        botao.addEventListener("click", () => {
+
+            botoesTamanho.forEach(outro => {
+                outro.classList.remove("ativo");
+                outro.setAttribute("aria-pressed", "false");
+            });
+
+            botao.classList.add("ativo");
+
+            botao.setAttribute("aria-pressed", "true");
+
+            tamanho = botao.getAttribute("data-tamanho");
+
+            zonaTamanho.classList.remove("pendente");
+
+        });
+
+    });
+
+    botaoAdicionar.addEventListener("click", evento => {
+
+        evento.preventDefault();
+
+        if (!tamanho) {
+
+            zonaTamanho.classList.add("pendente");
+
+            zonaTamanho.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            mostrarAviso("Selecione o tamanho antes de adicionar.", "erro");
+
+            return;
+
+        }
 
         adicionarAoCarrinho({
             nome: kit.nome,
             tamanho: tamanho,
-            imagem: imagem,
-            pagina: pagina,
+            imagem: camiseta.imagem,
+            pagina: kit.pagina,
             preco: kit.preco,
-            variante: nome
+            variante: camiseta.nome,
+            acessorio: acessorio.nome
         });
 
-        confirmar(botao);
+        botaoAdicionar.classList.remove("confirmado");
 
-        mostrarAviso(kit.nome + " (" + nome + ") - " + tamanho + " adicionado ao carrinho.");
+        void botaoAdicionar.offsetWidth;
+
+        botaoAdicionar.classList.add("confirmado");
+
+        mostrarAviso(kit.nome + " (" + camiseta.nome + ") - " + tamanho + " adicionado ao carrinho.");
 
     });
+
+    desenhar();
 
 }
 
@@ -625,6 +793,29 @@ function escapar(texto) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+
+}
+
+
+/* Linhas que descrevem o que vem em cada kit. Itens antigos, gravados
+   antes da escolha de camiseta e acessório, usam a composição padrão. */
+
+function detalhesKit(item) {
+
+    const kit = CATALOGO.find(p => p.kit && p.nome === item.nome);
+
+    if (!kit) {
+        return [];
+    }
+
+    if (!item.variante) {
+        return [kit.composicao];
+    }
+
+    return [
+        "Camiseta: " + item.variante,
+        "Acessório: " + (item.acessorio || "Strap Oficial Legacy")
+    ];
 
 }
 
@@ -679,15 +870,9 @@ function renderizarCarrinho() {
             ? '<a class="carrinho-item-nome" href="' + escapar(item.pagina) + '">' + escapar(item.nome) + '</a>'
             : '<span class="carrinho-item-nome">' + escapar(item.nome) + '</span>';
 
-        const kit = CATALOGO.find(p => p.kit && p.nome === item.nome);
-
-        const composicao = kit
-            ? '<span class="carrinho-item-composicao">' + escapar(kit.composicao) + '</span>'
-            : '';
-
-        const camiseta = item.variante
-            ? '<span class="carrinho-item-composicao">Camiseta: ' + escapar(item.variante) + '</span>'
-            : '';
+        const composicao = detalhesKit(item)
+            .map(linha => '<span class="carrinho-item-composicao">' + escapar(linha) + '</span>')
+            .join("");
 
         const unitario = precoDoItem(item);
 
@@ -707,7 +892,6 @@ function renderizarCarrinho() {
                 '<div class="carrinho-item-info">' +
                     nome +
                     composicao +
-                    camiseta +
                     '<span class="carrinho-item-tamanho">Tamanho ' + escapar(item.tamanho) + '</span>' +
                     valores +
                 '</div>' +
@@ -753,8 +937,6 @@ function montarMensagemWhatsApp() {
 
     const linhas = itens.map(item => {
 
-        const kit = CATALOGO.find(p => p.kit && p.nome === item.nome);
-
         const unitario = precoDoItem(item);
 
         const valor = unitario > 0
@@ -762,9 +944,8 @@ function montarMensagemWhatsApp() {
             : "";
 
         return item.quantidade + "x " + item.nome + valor + "\n" +
-            (item.variante ? "Camiseta: " + item.variante + "\n" : "") +
-            "Tamanho: " + item.tamanho +
-            (kit ? "\nInclui: " + kit.composicao : "");
+            detalhesKit(item).map(linha => linha + "\n").join("") +
+            "Tamanho: " + item.tamanho;
 
     });
 
@@ -979,6 +1160,8 @@ function montarDrawer() {
 
                 '<a class="drawer-link" href="' + destino("acessorios") + '">Acessórios</a>' +
 
+                '<a class="drawer-link" href="' + destino("kits") + '">Kits</a>' +
+
             '</div>' +
 
             '<div class="drawer-grupo">' +
@@ -1147,22 +1330,22 @@ const CATALOGO = [
     { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
     { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
 
-    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90 },
-    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90 },
+    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "unissex", preco: 89.90 },
+    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "unissex", preco: 89.90 },
 
     { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina", publico: "feminino", preco: 89.90 },
     { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina", publico: "feminino", preco: 89.90 },
 
     { nome: "Strap Oficial Legacy", pagina: "strap-legacy.html", imagem: "strap legacy.jpeg", colecao: "acessorios", preco: 39.90 },
 
-    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90, oculto: true },
-    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90, oculto: true },
+    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "unissex", preco: 89.90, oculto: true },
+    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "unissex", preco: 89.90, oculto: true },
 
     /* Kits: entram no mesmo carrinho e são sugeridos de forma dirigida
        (ver escolherRecomendados), nunca no rodízio comum. */
 
-    { nome: "Starter Legacy", pagina: "index.html#kits", imagem: "camisa 1.jpeg", colecao: "kits", preco: 119.90, kit: true, publico: "masculino", composicao: "1x Camiseta Oversized + 1x Strap Oficial Legacy" },
-    { nome: "Legacy Feminine", pagina: "index.html#kits", imagem: "cropped strong girls off.jpeg", colecao: "kits", preco: 119.90, kit: true, publico: "feminino", composicao: "1x Camiseta Cropped + 1x Strap Oficial Legacy" }
+    { nome: "Starter Legacy", pagina: "starter-legacy.html", imagem: "camisa 1.jpeg", colecao: "kits", preco: 119.90, kit: true, aceita: ["masculino", "unissex"], composicao: "1x Camiseta Oversized + 1x Strap Oficial Legacy" },
+    { nome: "Legacy Feminine", pagina: "legacy-feminine.html", imagem: "cropped strong girls off.jpeg", colecao: "kits", preco: 119.90, kit: true, aceita: ["feminino", "unissex"], composicao: "1x Camiseta Cropped ou Essentials + 1x Strap Oficial Legacy" }
 
 ];
 
@@ -1198,10 +1381,8 @@ function escolherRecomendados(atual) {
     /* Kit do mesmo público (na página do Strap, os dois kits) e o
        Strap Oficial vêm primeiro; depois uma peça da mesma coleção */
 
-    const publico = atual.colecao === "feminina" ? "feminino" : "masculino";
-
     CATALOGO.filter(p =>
-        p.kit && (atual.colecao === "acessorios" || p.publico === publico)
+        p.kit && (atual.colecao === "acessorios" || p.aceita.includes(atual.publico))
     ).forEach(juntar);
 
     sugeriveis.filter(p => p.colecao === "acessorios").forEach(juntar);
@@ -1312,7 +1493,8 @@ function montarRecomendados() {
 
         atual = {
             pagina: pagina,
-            colecao: "drop01"
+            colecao: "drop01",
+            publico: "masculino"
         };
 
     }
@@ -1377,6 +1559,8 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarContador();
 
     iniciarPaginaProduto();
+
+    iniciarPaginaKit();
 
     iniciarPaginaCarrinho();
 
