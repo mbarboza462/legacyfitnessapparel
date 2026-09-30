@@ -3012,3 +3012,236 @@ transform:none;
 }
 
 }
+
+/* =========================
+PREÇOS
+=========================
+
+Branco, Montserrat pesado e sem selos promocionais: o valor
+aparece como parte natural do card, não como oferta.
+*/
+
+.produto-info .produto-preco{
+
+margin-top:14px;
+
+font-family:'Montserrat',sans-serif;
+
+font-size:1.2rem;
+
+font-weight:800;
+
+letter-spacing:.5px;
+
+color:#ffffff;
+
+line-height:1.2;
+
+}
+
+.produto-preco-detalhe{
+
+margin:-8px 0 26px 0;
+
+font-family:'Montserrat',sans-serif;
+
+font-size:1.7rem;
+
+font-weight:800;
+
+letter-spacing:.5px;
+
+color:#ffffff;
+
+line-height:1.2;
+
+}
+
+.recomendados-trilha .produto-info .produto-preco{
+
+margin-top:8px;
+
+font-size:1.05rem;
+
+}
+
+/* =========================
+KITS — COMPLETE SEU KIT
+========================= */
+
+.grid-kits{
+
+display:grid;
+
+grid-template-columns:
+repeat(2,minmax(0,1fr));
+
+gap:35px;
+
+max-width:980px;
+
+margin:0 auto;
+
+}
+
+.kit-card{
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.kit-imagens{
+
+display:grid;
+
+grid-template-columns:
+1fr 1fr;
+
+gap:2px;
+
+overflow:hidden;
+
+}
+
+.kit-imagens img{
+
+width:100%;
+
+aspect-ratio:1 / 1;
+
+object-fit:cover;
+
+}
+
+.kit-card .produto-info{
+
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+padding:26px 24px 28px;
+
+}
+
+.kit-card .produto-info h3{
+
+font-size:1.25rem;
+
+font-weight:800;
+
+letter-spacing:1.5px;
+
+margin-bottom:10px;
+
+}
+
+.kit-card .produto-info .kit-composicao{
+
+font-size:.8rem;
+
+letter-spacing:1px;
+
+text-transform:uppercase;
+
+color:#8f8f8f;
+
+}
+
+.kit-card .produto-info .kit-descricao{
+
+margin:16px 0 22px;
+
+flex:1;
+
+}
+
+.kit-card .tamanhos{
+
+margin-bottom:22px;
+
+}
+
+.kit-card .tamanhos-opcoes{
+
+justify-content:center;
+
+}
+
+.kit-card .btn-carrinho{
+
+width:100%;
+
+padding:17px 20px;
+
+letter-spacing:1.5px;
+
+font-size:.9rem;
+
+}
+
+@media(max-width:900px){
+
+.grid-kits{
+
+grid-template-columns:
+minmax(0,1fr);
+
+gap:26px;
+
+max-width:460px;
+
+}
+
+.kit-card .tamanho-btn{
+
+min-height:46px;
+
+min-width:56px;
+
+}
+
+.kit-card .btn-carrinho{
+
+min-height:52px;
+
+}
+
+}
+
+/* =========================
+CARRINHO — PREÇOS E KITS
+========================= */
+
+.carrinho-item-composicao{
+
+font-size:.78rem;
+
+letter-spacing:.5px;
+
+color:#8f8f8f;
+
+}
+
+.carrinho-item-preco{
+
+font-size:.98rem;
+
+font-weight:800;
+
+color:#ffffff;
+
+}
+
+.carrinho-item-subtotal{
+
+font-size:.82rem;
+
+color:#bdbdbd;
+
+}

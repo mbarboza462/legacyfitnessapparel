@@ -88,6 +88,7 @@ function lerCarrinho() {
             tamanho: item.tamanho,
             imagem: typeof item.imagem === "string" ? item.imagem : "",
             pagina: typeof item.pagina === "string" ? item.pagina : "",
+            preco: Number(item.preco) > 0 ? Number(item.preco) : 0,
             quantidade: Number(item.quantidade) > 0 ? Math.floor(Number(item.quantidade)) : 1
         }));
 
@@ -134,6 +135,45 @@ function totalPecas() {
 }
 
 
+/* Preços em reais. O valor do catálogo tem prioridade; o que
+   foi gravado no item só vale para peças fora do catálogo. */
+
+function formatarPreco(valor) {
+
+    return "R$ " + (Math.round(valor * 100) / 100)
+        .toFixed(2)
+        .replace(".", ",");
+
+}
+
+
+function precoDoItem(item) {
+
+    const doCatalogo = CATALOGO.find(p => p.nome === item.nome) ||
+        CATALOGO.find(p => !p.kit && item.pagina && p.pagina === item.pagina);
+
+    if (doCatalogo && doCatalogo.preco) {
+        return doCatalogo.preco;
+    }
+
+    return item.preco || 0;
+
+}
+
+
+/* Valor total em centavos, para evitar erro de ponto flutuante */
+
+function totalCentavos() {
+
+    return lerCarrinho().reduce(
+        (soma, item) =>
+            soma + Math.round(precoDoItem(item) * 100) * item.quantidade,
+        0
+    );
+
+}
+
+
 /* Adiciona um produto ao carrinho */
 
 function adicionarAoCarrinho(produto) {
@@ -156,6 +196,7 @@ function adicionarAoCarrinho(produto) {
             tamanho: produto.tamanho,
             imagem: produto.imagem || "",
             pagina: produto.pagina || "",
+            preco: Number(produto.preco) > 0 ? Number(produto.preco) : 0,
             quantidade: 1
         });
 
@@ -308,13 +349,18 @@ function mostrarAviso(mensagem, tipo) {
 
 function iniciarPaginaProduto() {
 
-    const bloco = document.querySelector("[data-produto]");
+    /* Páginas de produto têm um bloco; a home tem um por kit */
 
-    if (!bloco) {
-        return;
-    }
+    document.querySelectorAll("[data-produto]").forEach(iniciarBlocoProduto);
+
+}
+
+
+function iniciarBlocoProduto(bloco) {
 
     const nome = bloco.getAttribute("data-produto");
+
+    const preco = Number(bloco.getAttribute("data-preco")) || 0;
 
     const imagem = bloco.getAttribute("data-imagem") || "";
 
@@ -390,7 +436,8 @@ function iniciarPaginaProduto() {
             nome: nome,
             tamanho: tamanhoEscolhido,
             imagem: imagem,
-            pagina: pagina
+            pagina: pagina,
+            preco: preco
         });
 
         botaoAdicionar.classList.remove("confirmado");
@@ -472,6 +519,22 @@ function renderizarCarrinho() {
             ? '<a class="carrinho-item-nome" href="' + escapar(item.pagina) + '">' + escapar(item.nome) + '</a>'
             : '<span class="carrinho-item-nome">' + escapar(item.nome) + '</span>';
 
+        const kit = CATALOGO.find(p => p.kit && p.nome === item.nome);
+
+        const composicao = kit
+            ? '<span class="carrinho-item-composicao">' + escapar(kit.composicao) + '</span>'
+            : '';
+
+        const unitario = precoDoItem(item);
+
+        const valores = unitario > 0
+            ? '<span class="carrinho-item-preco">' + formatarPreco(unitario) + '</span>' +
+              (item.quantidade > 1
+                  ? '<span class="carrinho-item-subtotal">Subtotal: ' +
+                    formatarPreco(unitario * item.quantidade) + '</span>'
+                  : '')
+            : '';
+
         return '' +
             '<article class="carrinho-item">' +
 
@@ -479,7 +542,9 @@ function renderizarCarrinho() {
 
                 '<div class="carrinho-item-info">' +
                     nome +
+                    composicao +
                     '<span class="carrinho-item-tamanho">Tamanho ' + escapar(item.tamanho) + '</span>' +
+                    valores +
                 '</div>' +
 
                 '<div class="carrinho-item-qtd">' +
@@ -500,8 +565,11 @@ function renderizarCarrinho() {
 
     if (rotuloTotal) {
 
+        const centavos = totalCentavos();
+
         rotuloTotal.textContent =
-            "Total: " + total + (total === 1 ? " peça" : " peças");
+            "Total: " + formatarPreco(centavos / 100) +
+            " (" + total + (total === 1 ? " item)" : " itens)");
 
     }
 
@@ -520,22 +588,24 @@ function montarMensagemWhatsApp() {
 
     const linhas = itens.map(item => {
 
-        const quantidade = item.quantidade > 1
-            ? " (" + item.quantidade + " unidades)"
+        const kit = CATALOGO.find(p => p.kit && p.nome === item.nome);
+
+        const unitario = precoDoItem(item);
+
+        const valor = unitario > 0
+            ? " - " + formatarPreco(unitario * item.quantidade)
             : "";
 
-        return "• " + item.nome + " - " + item.tamanho + quantidade;
+        return item.quantidade + "x " + item.nome + valor + "\n" +
+            "Tamanho: " + item.tamanho +
+            (kit ? "\nInclui: " + kit.composicao : "");
 
     });
 
-    const total = totalPecas();
-
     const mensagem =
-        "Olá!\n" +
-        "Tenho interesse nos seguintes produtos:\n\n" +
-        linhas.join("\n") + "\n\n" +
-        "Total de peças: " + total + "\n\n" +
-        "Gostaria de verificar disponibilidade.";
+        "Olá! Gostaria de fazer um pedido:\n\n" +
+        linhas.join("\n\n") + "\n\n" +
+        "Total: " + formatarPreco(totalCentavos() / 100);
 
     return mensagem;
 
@@ -904,23 +974,29 @@ function montarDrawer() {
 
 const CATALOGO = [
 
-    { nome: "Berserk", pagina: "berserk.html", imagem: "camisa 1.jpeg", colecao: "drop01" },
-    { nome: "Bulking", pagina: "bulking.html", imagem: "camisa 3.jpeg", colecao: "drop01" },
-    { nome: "One More Rep", pagina: "onemorerep.html", imagem: "camisa 4.jpeg", colecao: "drop01" },
-    { nome: "Gym Study Sleep Repeat", pagina: "gymstudy.html", imagem: "camisa 2.jpeg", colecao: "drop01" },
-    { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01" },
-    { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01" },
+    { nome: "Berserk", pagina: "berserk.html", imagem: "camisa 1.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "Bulking", pagina: "bulking.html", imagem: "camisa 3.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "One More Rep", pagina: "onemorerep.html", imagem: "camisa 4.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "Gym Study Sleep Repeat", pagina: "gymstudy.html", imagem: "camisa 2.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01", preco: 89.90 },
 
-    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials" },
-    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials" },
+    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", preco: 89.90 },
+    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", preco: 89.90 },
 
-    { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina" },
-    { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina" },
+    { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina", preco: 89.90 },
+    { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina", preco: 89.90 },
 
-    { nome: "Strap Oficial Legacy", pagina: "strap-legacy.html", imagem: "strap legacy.jpeg", colecao: "acessorios" },
+    { nome: "Strap Oficial Legacy", pagina: "strap-legacy.html", imagem: "strap legacy.jpeg", colecao: "acessorios", preco: 39.90 },
 
-    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", oculto: true },
-    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", oculto: true }
+    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", preco: 89.90, oculto: true },
+    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", preco: 89.90, oculto: true },
+
+    /* Kits: entram no mesmo carrinho e são sugeridos de forma dirigida
+       (ver escolherRecomendados), nunca no rodízio comum. */
+
+    { nome: "Starter Legacy", pagina: "index.html#kits", imagem: "camisa 1.jpeg", colecao: "kits", preco: 119.90, kit: true, publico: "masculino", composicao: "1x Camiseta Oversized + 1x Strap Oficial Legacy" },
+    { nome: "Legacy Feminine", pagina: "index.html#kits", imagem: "cropped strong girls off.jpeg", colecao: "kits", preco: 119.90, kit: true, publico: "feminino", composicao: "1x Camiseta Cropped + 1x Strap Oficial Legacy" }
 
 ];
 
@@ -937,7 +1013,7 @@ const ORDEM_COMPLEMENTO = ["essentials", "acessorios", "feminina", "drop01"];
 function escolherRecomendados(atual) {
 
     const sugeriveis = CATALOGO.filter(p =>
-        !p.oculto && p.pagina !== atual.pagina
+        !p.oculto && !p.kit && p.pagina !== atual.pagina
     );
 
     const escolhidos = [];
@@ -953,7 +1029,18 @@ function escolherRecomendados(atual) {
 
     };
 
-    /* Até duas peças da mesma coleção, a partir da posição atual */
+    /* Kit do mesmo público (na página do Strap, os dois kits) e o
+       Strap Oficial vêm primeiro; depois uma peça da mesma coleção */
+
+    const publico = atual.colecao === "feminina" ? "feminino" : "masculino";
+
+    CATALOGO.filter(p =>
+        p.kit && (atual.colecao === "acessorios" || p.publico === publico)
+    ).forEach(juntar);
+
+    sugeriveis.filter(p => p.colecao === "acessorios").forEach(juntar);
+
+    const limiteMesma = escolhidos.length + 1;
 
     const mesma = sugeriveis.filter(p => p.colecao === atual.colecao);
 
@@ -963,7 +1050,7 @@ function escolherRecomendados(atual) {
 
         const inicio = Math.max(0, todas.findIndex(p => p.pagina === atual.pagina));
 
-        for (let i = 1; i <= todas.length && escolhidos.length < 2; i++) {
+        for (let i = 1; i <= todas.length && escolhidos.length < limiteMesma; i++) {
 
             const candidato = todas[(inicio + i) % todas.length];
 
@@ -1053,7 +1140,7 @@ function montarRecomendados() {
 
     const pagina = bloco.getAttribute("data-pagina");
 
-    let atual = CATALOGO.find(p => p.pagina === pagina);
+    let atual = CATALOGO.find(p => !p.kit && p.pagina === pagina);
 
     if (!atual) {
 
@@ -1097,6 +1184,8 @@ function montarRecomendados() {
                     '<div class="produto-info">' +
 
                         '<h3>' + escapar(item.nome) + '</h3>' +
+
+                        '<p class="produto-preco">' + formatarPreco(item.preco) + '</p>' +
 
                     '</div>' +
 
