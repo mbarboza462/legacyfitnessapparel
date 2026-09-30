@@ -89,6 +89,7 @@ function lerCarrinho() {
             imagem: typeof item.imagem === "string" ? item.imagem : "",
             pagina: typeof item.pagina === "string" ? item.pagina : "",
             preco: Number(item.preco) > 0 ? Number(item.preco) : 0,
+            variante: typeof item.variante === "string" ? item.variante : "",
             quantidade: Number(item.quantidade) > 0 ? Math.floor(Number(item.quantidade)) : 1
         }));
 
@@ -182,7 +183,8 @@ function adicionarAoCarrinho(produto) {
 
     const existente = itens.find(item =>
         item.nome === produto.nome &&
-        item.tamanho === produto.tamanho
+        item.tamanho === produto.tamanho &&
+        item.variante === (produto.variante || "")
     );
 
     if (existente) {
@@ -197,6 +199,7 @@ function adicionarAoCarrinho(produto) {
             imagem: produto.imagem || "",
             pagina: produto.pagina || "",
             preco: Number(produto.preco) > 0 ? Number(produto.preco) : 0,
+            variante: produto.variante || "",
             quantidade: 1
         });
 
@@ -362,7 +365,7 @@ function iniciarBlocoProduto(bloco) {
 
     const preco = Number(bloco.getAttribute("data-preco")) || 0;
 
-    const imagem = bloco.getAttribute("data-imagem") || "";
+    let imagem = bloco.getAttribute("data-imagem") || "";
 
     const pagina = bloco.getAttribute("data-pagina") || "";
 
@@ -373,6 +376,51 @@ function iniciarBlocoProduto(bloco) {
     const botaoAdicionar = bloco.querySelector(".btn-carrinho");
 
     let tamanhoEscolhido = "";
+
+    /* Kits da home: o cliente escolhe qual camiseta leva junto */
+
+    let variante = "";
+
+    const selectCamiseta = bloco.querySelector(".kit-camiseta");
+
+    if (selectCamiseta) {
+
+        const publico = bloco.getAttribute("data-publico");
+
+        const camisetas = CATALOGO.filter(p =>
+            !p.kit && !p.oculto && p.publico === publico
+        );
+
+        selectCamiseta.innerHTML = camisetas.map(p =>
+            '<option value="' + escapar(p.nome) + '">' + escapar(p.nome) + '</option>'
+        ).join("");
+
+        const fotoCamiseta = bloco.querySelector(".kit-imagens img");
+
+        const aplicarCamiseta = () => {
+
+            const escolhida = camisetas.find(p => p.nome === selectCamiseta.value);
+
+            if (!escolhida) {
+                return;
+            }
+
+            variante = escolhida.nome;
+
+            imagem = escolhida.imagem;
+
+            if (fotoCamiseta) {
+                fotoCamiseta.src = escolhida.imagem;
+                fotoCamiseta.alt = escolhida.nome;
+            }
+
+        };
+
+        selectCamiseta.addEventListener("change", aplicarCamiseta);
+
+        aplicarCamiseta();
+
+    }
 
     /* Produtos de tamanho único já chegam com a opção marcada */
 
@@ -405,6 +453,46 @@ function iniciarBlocoProduto(bloco) {
 
     });
 
+    /* Confere o tamanho; se faltar, destaca o seletor e avisa */
+
+    const exigirTamanho = () => {
+
+        if (tamanhoEscolhido) {
+            return true;
+        }
+
+        if (seletor) {
+
+            seletor.classList.add("pendente");
+
+            seletor.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+        mostrarAviso("Selecione o tamanho antes de adicionar.", "erro");
+
+        return false;
+
+    };
+
+    const confirmar = botao => {
+
+        botao.classList.remove("confirmado");
+
+        void botao.offsetWidth;
+
+        botao.classList.add("confirmado");
+
+    };
+
+    /* Nas páginas de produto, oferece o kit com a peça que o cliente
+       já está vendo e o tamanho que ele escolher ali */
+
+    montarKitNaPagina(bloco, nome, imagem, pagina, () => tamanhoEscolhido, exigirTamanho, confirmar);
+
     if (!botaoAdicionar) {
         return;
     }
@@ -413,23 +501,8 @@ function iniciarBlocoProduto(bloco) {
 
         evento.preventDefault();
 
-        if (!tamanhoEscolhido) {
-
-            if (seletor) {
-
-                seletor.classList.add("pendente");
-
-                seletor.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-            }
-
-            mostrarAviso("Selecione o tamanho antes de adicionar.", "erro");
-
+        if (!exigirTamanho()) {
             return;
-
         }
 
         adicionarAoCarrinho({
@@ -437,16 +510,103 @@ function iniciarBlocoProduto(bloco) {
             tamanho: tamanhoEscolhido,
             imagem: imagem,
             pagina: pagina,
-            preco: preco
+            preco: preco,
+            variante: variante
         });
 
-        botaoAdicionar.classList.remove("confirmado");
+        confirmar(botaoAdicionar);
 
-        void botaoAdicionar.offsetWidth;
+        mostrarAviso(
+            nome + (variante ? " (" + variante + ")" : "") +
+            " - " + tamanhoEscolhido + " adicionado ao carrinho."
+        );
 
-        botaoAdicionar.classList.add("confirmado");
+    });
 
-        mostrarAviso(nome + " - " + tamanhoEscolhido + " adicionado ao carrinho.");
+}
+
+
+/* Bloco "Complete seu kit" dentro da página do produto */
+
+function montarKitNaPagina(bloco, nome, imagem, pagina, lerTamanho, exigirTamanho, confirmar) {
+
+    const acoes = bloco.querySelector(".produto-acoes");
+
+    const atual = CATALOGO.find(p => !p.kit && p.pagina === pagina);
+
+    if (!acoes || !atual || bloco.querySelector(".kit-upsell")) {
+        return;
+    }
+
+    const caixa = document.createElement("div");
+
+    caixa.className = "kit-upsell";
+
+    const strap = CATALOGO.find(p => p.colecao === "acessorios");
+
+    /* Página do Strap: leva o cliente aos kits que o incluem */
+
+    if (atual.colecao === "acessorios") {
+
+        caixa.innerHTML = '' +
+            '<div class="kit-upsell-texto">' +
+                '<span class="kit-upsell-rotulo">COMPLETE SEU KIT</span>' +
+                '<strong>Leve o Strap com uma camiseta Legacy</strong>' +
+                '<small>Starter Legacy e Legacy Feminine, ' +
+                formatarPreco(119.90) + ' cada.</small>' +
+            '</div>' +
+            '<a class="kit-upsell-botao" href="index.html#kits">Ver kits</a>';
+
+        acoes.insertAdjacentElement("afterend", caixa);
+
+        return;
+
+    }
+
+    const publico = atual.colecao === "feminina" ? "feminino" : "masculino";
+
+    const kit = CATALOGO.find(p => p.kit && p.publico === publico);
+
+    if (!kit || !strap) {
+        return;
+    }
+
+    caixa.innerHTML = '' +
+        '<div class="kit-upsell-imagens">' +
+            '<img src="' + escapar(imagem) + '" alt="' + escapar(nome) + '">' +
+            '<img src="' + escapar(strap.imagem) + '" alt="' + escapar(strap.nome) + '">' +
+        '</div>' +
+        '<div class="kit-upsell-texto">' +
+            '<span class="kit-upsell-rotulo">COMPLETE SEU KIT</span>' +
+            '<strong>' + escapar(kit.nome) + ' · ' + formatarPreco(kit.preco) + '</strong>' +
+            '<small>Esta camiseta + Strap Oficial Legacy, no tamanho escolhido acima.</small>' +
+        '</div>' +
+        '<button type="button" class="kit-upsell-botao">Adicionar kit</button>';
+
+    acoes.insertAdjacentElement("afterend", caixa);
+
+    const botao = caixa.querySelector(".kit-upsell-botao");
+
+    botao.addEventListener("click", () => {
+
+        if (!exigirTamanho()) {
+            return;
+        }
+
+        const tamanho = lerTamanho();
+
+        adicionarAoCarrinho({
+            nome: kit.nome,
+            tamanho: tamanho,
+            imagem: imagem,
+            pagina: pagina,
+            preco: kit.preco,
+            variante: nome
+        });
+
+        confirmar(botao);
+
+        mostrarAviso(kit.nome + " (" + nome + ") - " + tamanho + " adicionado ao carrinho.");
 
     });
 
@@ -525,6 +685,10 @@ function renderizarCarrinho() {
             ? '<span class="carrinho-item-composicao">' + escapar(kit.composicao) + '</span>'
             : '';
 
+        const camiseta = item.variante
+            ? '<span class="carrinho-item-composicao">Camiseta: ' + escapar(item.variante) + '</span>'
+            : '';
+
         const unitario = precoDoItem(item);
 
         const valores = unitario > 0
@@ -543,6 +707,7 @@ function renderizarCarrinho() {
                 '<div class="carrinho-item-info">' +
                     nome +
                     composicao +
+                    camiseta +
                     '<span class="carrinho-item-tamanho">Tamanho ' + escapar(item.tamanho) + '</span>' +
                     valores +
                 '</div>' +
@@ -597,6 +762,7 @@ function montarMensagemWhatsApp() {
             : "";
 
         return item.quantidade + "x " + item.nome + valor + "\n" +
+            (item.variante ? "Camiseta: " + item.variante + "\n" : "") +
             "Tamanho: " + item.tamanho +
             (kit ? "\nInclui: " + kit.composicao : "");
 
@@ -974,23 +1140,23 @@ function montarDrawer() {
 
 const CATALOGO = [
 
-    { nome: "Berserk", pagina: "berserk.html", imagem: "camisa 1.jpeg", colecao: "drop01", preco: 89.90 },
-    { nome: "Bulking", pagina: "bulking.html", imagem: "camisa 3.jpeg", colecao: "drop01", preco: 89.90 },
-    { nome: "One More Rep", pagina: "onemorerep.html", imagem: "camisa 4.jpeg", colecao: "drop01", preco: 89.90 },
-    { nome: "Gym Study Sleep Repeat", pagina: "gymstudy.html", imagem: "camisa 2.jpeg", colecao: "drop01", preco: 89.90 },
-    { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01", preco: 89.90 },
-    { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01", preco: 89.90 },
+    { nome: "Berserk", pagina: "berserk.html", imagem: "camisa 1.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
+    { nome: "Bulking", pagina: "bulking.html", imagem: "camisa 3.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
+    { nome: "One More Rep", pagina: "onemorerep.html", imagem: "camisa 4.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
+    { nome: "Gym Study Sleep Repeat", pagina: "gymstudy.html", imagem: "camisa 2.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
+    { nome: "Warrior", pagina: "warrior.html", imagem: "camisa 5.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
+    { nome: "Disciplina", pagina: "disciplina.html", imagem: "camisa disciplina.jpeg", colecao: "drop01", publico: "masculino", preco: 89.90 },
 
-    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", preco: 89.90 },
-    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", preco: 89.90 },
+    { nome: "Essential Off White", pagina: "essential-off.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90 },
+    { nome: "Essential Preta", pagina: "essential-preta.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90 },
 
-    { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina", preco: 89.90 },
-    { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina", preco: 89.90 },
+    { nome: "Strong Girls Off White", pagina: "feminina-1.html", imagem: "cropped strong girls off.jpeg", colecao: "feminina", publico: "feminino", preco: 89.90 },
+    { nome: "Strong Girls Preta", pagina: "feminina-2.html", imagem: "cropped strong girls preta.jpeg", colecao: "feminina", publico: "feminino", preco: 89.90 },
 
     { nome: "Strap Oficial Legacy", pagina: "strap-legacy.html", imagem: "strap legacy.jpeg", colecao: "acessorios", preco: 39.90 },
 
-    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", preco: 89.90, oculto: true },
-    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", preco: 89.90, oculto: true },
+    { nome: "Tradicional Off", pagina: "tradicionaloff.html", imagem: "camisa tradicional off.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90, oculto: true },
+    { nome: "Tradicional Preta", pagina: "tradicionalpreto.html", imagem: "camisa tradicional preto.jpeg", colecao: "essentials", publico: "masculino", preco: 89.90, oculto: true },
 
     /* Kits: entram no mesmo carrinho e são sugeridos de forma dirigida
        (ver escolherRecomendados), nunca no rodízio comum. */
